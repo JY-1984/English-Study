@@ -570,40 +570,60 @@
 
         // 일차 선택
         function selectDay(day) {
+            console.log('Selecting day:', day); // 디버깅용
             currentDay = day;
             currentWords = sampleWords[day] || generateSampleWords(day);
+            console.log('Current words:', currentWords); // 디버깅용
             currentWordIndex = 0;
             currentMode = 'learn';
+            isCardFlipped = false;
+            quizAnswered = false;
+            quizScore = 0;
             showLearningScreen();
         }
 
         // 샘플 단어 생성 (3일차 이후)
         function generateSampleWords(day) {
+            console.log('Generating sample words for day:', day); // 디버깅용
+            
             const baseWords = [
                 { word: "example", meaning: "예시", pronunciation: "[ig'zæmpl]", example: "This is an example." },
                 { word: "important", meaning: "중요한", pronunciation: "[im'pɔ:rtənt]", example: "This is important." },
                 { word: "different", meaning: "다른", pronunciation: "[difərənt]", example: "This is different." },
                 { word: "possible", meaning: "가능한", pronunciation: "[pɑ:səbl]", example: "It's possible." },
-                { word: "necessary", meaning: "필요한", pronunciation: "[nesəseri]", example: "It's necessary." }
+                { word: "necessary", meaning: "필요한", pronunciation: "[nesəseri]", example: "It's necessary." },
+                { word: "beautiful", meaning: "아름다운", pronunciation: "[bju:təfəl]", example: "The sunset is beautiful." },
+                { word: "interesting", meaning: "흥미로운", pronunciation: "[intərəstiŋ]", example: "This book is interesting." },
+                { word: "difficult", meaning: "어려운", pronunciation: "[difikəlt]", example: "This problem is difficult." },
+                { word: "wonderful", meaning: "멋진", pronunciation: "[wʌndərfəl]", example: "What a wonderful day!" },
+                { word: "excellent", meaning: "훌륭한", pronunciation: "[eksələnt]", example: "Your work is excellent." }
             ];
             
             const words = [];
             for (let i = 0; i < 10; i++) {
                 const base = baseWords[i % baseWords.length];
                 words.push({
-                    word: `${base.word}${day}${i}`,
-                    meaning: `${base.meaning} ${day}-${i}`,
+                    word: `${base.word}_${day}`,
+                    meaning: `${base.meaning}`,
                     pronunciation: base.pronunciation,
-                    example: `${base.example} (Day ${day})`
+                    example: `${base.example} (Day ${day} 학습)`
                 });
             }
+            
+            console.log('Generated words:', words); // 디버깅용
             return words;
         }
 
         // 학습 화면 표시
         function showLearningScreen() {
+            console.log('Showing learning screen'); // 디버깅용
+            console.log('Current day:', currentDay, 'Current words:', currentWords); // 디버깅용
+            
             document.getElementById('mainScreen').classList.add('hidden');
             document.getElementById('learningScreen').classList.remove('hidden');
+            
+            // 완료 버튼 숨기기
+            document.getElementById('completeDayBtn').style.display = 'none';
             
             setMode('learn');
             resetCard();
@@ -612,6 +632,7 @@
 
         // 모드 설정
         function setMode(mode) {
+            console.log('Setting mode to:', mode); // 디버깅용
             currentMode = mode;
             
             // 모드 버튼 업데이트
@@ -639,12 +660,21 @@
 
         // 단어 표시 업데이트
         function updateWordDisplay() {
+            console.log('Updating word display, index:', currentWordIndex, 'total:', currentWords.length); // 디버깅용
+            
+            if (!currentWords || currentWords.length === 0) {
+                console.error('No words available for current day'); // 디버깅용
+                return;
+            }
+            
             if (currentWordIndex >= currentWords.length) {
                 document.getElementById('completeDayBtn').style.display = 'inline-block';
                 return;
             }
             
             const word = currentWords[currentWordIndex];
+            console.log('Current word:', word); // 디버깅용
+            
             document.getElementById('dayTitle').textContent = `Day ${currentDay} - 학습`;
             document.getElementById('currentWord').textContent = word.word;
             document.getElementById('currentPronunciation').textContent = word.pronunciation;
